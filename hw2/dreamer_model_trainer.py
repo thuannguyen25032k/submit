@@ -574,7 +574,9 @@ def my_main(cfg: DictConfig):
             ## Call model_wrapper.forward_pass() with appropriate inputs based on model type
             if model_type == 'dreamer':
                 if (cfg.use_policy and (cfg.planner.type == 'policy' or cfg.planner.type == 'policy_guided_cem')):  
-                    policy_loss = planner.update(normalized_poses, normalized_actions)
+                    # PolicyPlanner.update() for Dreamer expects image sequences (B,T,C,H,W)
+                    # so it can encode them and build RSSM features [h,z] as policy inputs.
+                    policy_loss = planner.update(normalized_images, normalized_actions)
                 model_out = model_wrapper.forward_pass(normalized_images, None, normalized_actions)
                 loss_dict = model_wrapper.compute_loss(
                     model_out,
