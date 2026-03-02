@@ -131,8 +131,8 @@ class SimpleWorldModel(GRPBase):
         # Add optional weighting if desired (e.g., total_loss = pose_loss + reward_loss * reward_weight)
         # Add any regularization losses if needed (e.g., L2 on weights)
         loss_dict = {
-            'pose_loss': pose_loss.item(),
-            'reward_loss': reward_loss.item() if target_reward is not None else 0.0,
-            'total_loss': total_loss.item(),
+            'pose_loss': pose_loss,
+            'reward_loss': reward_loss if target_reward is not None else 0.0,
+            'total_loss': total_loss,
         }
         return loss_dict
