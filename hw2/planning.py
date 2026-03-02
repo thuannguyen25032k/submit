@@ -558,7 +558,18 @@ class PolicyPlanner(GRPBase):
                 "DreamerV3 planning requires initial_state with keys {'h','z'} (and optionally 'z_probs')."
             )
 
-        state = initial_state
+        # We evaluate K candidate action sequences in parallel.
+        # Expand the RSSM state to match the action batch dimension (K).
+        K = action_sequences.shape[0]
+        state = {
+            'h': initial_state['h'].expand(K, -1).contiguous(),
+            'z': initial_state['z'].expand(K, -1).contiguous(),
+        }
+        if 'z_probs' in initial_state and initial_state['z_probs'] is not None:
+            # z_probs may be (B, Z, C). Expand along batch.
+            state['z_probs'] = initial_state['z_probs'].expand(K, -1, -1).contiguous()
+        else:
+            state['z_probs'] = None
 
         self.world_model.eval()
         full_feat = []
@@ -581,7 +592,7 @@ class PolicyPlanner(GRPBase):
             # RewardPredictor outputs a scalar per feature vector.
             # DreamerV3 trains reward in symlog-space (see DreamerV3.compute_loss),
             # so here we sum predicted symlog rewards for ranking action sequences.
-            r_symlog = self.world_model.reward_head(full_feat.view(self.K * self.horizon, -1)).view(self.K, self.horizon)
+            r_symlog = self.world_model.reward_head(full_feat.view(K * self.horizon, -1)).view(K, self.horizon)
             total_rewards = r_symlog.sum(dim=-1)  # (K,)
         return total_rewards
 
