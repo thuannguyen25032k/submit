@@ -129,7 +129,7 @@ class CEMPlanner(Planner):
             # Update the mean and std of the action distribution using the elites
             new_mu = elite_action_sequences.mean(dim=0)  # (H, action_dim)
             # We could use unbiased=False to avoid NaN when M==1 (avoids division by N-1=0)
-            new_std = elite_action_sequences.std(dim=0, unbiased=True).clamp(min=1e-6)  # (H, action_dim)
+            new_std = elite_action_sequences.std(dim=0, unbiased=True).clamp(min=1e-3)  # (H, action_dim)
             
             # Smoothly update the distribution parameters with temperature alpha
             mu = self.alpha * new_mu + (1 - self.alpha) * mu
@@ -518,7 +518,7 @@ class PolicyPlanner(GRPBase):
             # Update the mean and std of the action distribution using the elites
             new_mu = elite_action_sequences.mean(dim=0)  # (H, action_dim)
             # We could use unbiased=False to avoid NaN when M==1 (avoids division by N-1=0)
-            new_std = elite_action_sequences.std(dim=0, unbiased=True).clamp(min=1e-6)  # (H, action_dim)
+            new_std = elite_action_sequences.std(dim=0, unbiased=True).clamp(min=1e-3)  # (H, action_dim)
             
             # Smoothly update the distribution parameters with temperature alpha
             mu = self.alpha * new_mu + (1 - self.alpha) * mu
