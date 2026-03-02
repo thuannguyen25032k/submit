@@ -682,7 +682,7 @@ class PolicyPlanner(GRPBase):
 
         # Build current RSSM state from the provided history.
         if prev_state is None:
-            print("No previous state provided; initializing new RSSM state.")
+            # print("No previous state provided; initializing new RSSM state.")
             state = self.world_model.get_initial_state(B, device=self.device)
         else:
             state = prev_state
